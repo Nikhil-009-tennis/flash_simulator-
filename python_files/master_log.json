@@ -1,0 +1,110 @@
+[
+  {
+    "timestamp": "2025-07-24 19:48:13",
+    "action": "add",
+    "student": {
+      "name": "Nikhil thota",
+      "age": 15,
+      "class": "bio",
+      "roll_number": "9"
+    },
+    "details": null
+  },
+  {
+    "timestamp": "2025-07-24 19:48:21",
+    "action": "edit",
+    "student": {
+      "name": "Nikhil thota",
+      "age": 154,
+      "class": "bio",
+      "roll_number": "9"
+    },
+    "details": {
+      "name": "Nikhil thota",
+      "age": 154,
+      "class": "bio"
+    }
+  },
+  {
+    "timestamp": "2025-07-24 19:48:27",
+    "action": "edit",
+    "student": {
+      "name": "Nikhil thota",
+      "age": 15,
+      "class": "bio",
+      "roll_number": "9"
+    },
+    "details": {
+      "name": "Nikhil thota",
+      "age": 15,
+      "class": "bio"
+    }
+  },
+  {
+    "timestamp": "2025-07-24 19:48:52",
+    "action": "add",
+    "student": {
+      "name": "akhil thota",
+      "age": 11,
+      "class": "maths",
+      "roll_number": "6"
+    },
+    "details": null
+  },
+  {
+    "timestamp": "2025-07-24 19:49:06",
+    "action": "remove",
+    "student": {
+      "name": "akhil thota",
+      "age": 11,
+      "class": "maths",
+      "roll_number": "6"
+    },
+    "details": null
+  },
+  {
+    "timestamp": "2025-07-24 19:51:39",
+    "action": "add",
+    "student": {
+      "name": "hagen",
+      "age": 24,
+      "class": "matsh",
+      "roll_number": "1"
+    },
+    "details": null
+  },
+  {
+    "timestamp": "2025-07-24 19:55:42",
+    "action": "edit",
+    "student": {
+      "name": "hagen",
+      "age": 24,
+      "class": "matsh",
+      "roll_number": "1",
+      "teacher_username": "Mrs. broom"
+    },
+    "details": {
+      "name": "hagen",
+      "age": 24,
+      "class": "matsh",
+      "teacher_username": "Mrs. broom"
+    }
+  },
+  {
+    "timestamp": "2025-07-24 19:55:48",
+    "action": "edit",
+    "student": {
+      "name": "Nikhil thota",
+      "age": 15,
+      "class": "bio",
+      "roll_number": "9",
+      "teacher_username": "Mrs. payne"
+    },
+    "details": {
+      "name": "Nikhil thota",
+      "age": 15,
+      "class": "bio",
+      "teacher_username": "Mrs. payne"
+    }
+  }
+]

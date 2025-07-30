@@ -1,0 +1,13 @@
+[
+  {
+    "timestamp": "2025-07-23 19:40:55",
+    "action": "add",
+    "student": {
+      "name": "nikhil",
+      "age": 16,
+      "class": "bio",
+      "roll_number": "9"
+    },
+    "details": null
+  }
+]

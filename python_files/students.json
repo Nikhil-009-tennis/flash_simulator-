@@ -1,0 +1,16 @@
+{
+  "9": {
+    "name": "Nikhil thota",
+    "age": 15,
+    "class": "bio",
+    "roll_number": "9",
+    "teacher_username": "Mrs. payne"
+  },
+  "1": {
+    "name": "hagen",
+    "age": 24,
+    "class": "matsh",
+    "roll_number": "1",
+    "teacher_username": "Mrs. broom"
+  }
+}

@@ -1,0 +1,1223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Flash Racing Game</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(to bottom, #1a1a2e, #16213e);
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        
+        .game-container {
+            text-align: center;
+            position: relative;
+        }
+        
+        canvas {
+            border: 3px solid #ff6b35;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(255, 107, 53, 0.3);
+            background: linear-gradient(to bottom, #1a1a2e, #16213e);
+        }
+        
+        .controls {
+            margin-top: 20px;
+            color: #ff6b35;
+        }
+        
+        .score {
+            font-size: 24px;
+            font-weight: bold;
+            color: #ff6b35;
+            margin-bottom: 10px;
+            text-shadow: 0 0 10px rgba(255, 107, 53, 0.5);
+        }
+        
+        .start-screen {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(26, 26, 46, 0.95);
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(255, 107, 53, 0.3);
+            border: 2px solid #ff6b35;
+        }
+        
+        .game-over {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            color: white;
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
+            border: 3px solid #ff6b35;
+            z-index: 100;
+            min-width: 300px;
+        }
+
+        .game-over h2 {
+            color: #ff6b35;
+            margin-bottom: 20px;
+            font-size: 28px;
+            text-shadow: 0 0 10px #ff6b35;
+        }
+
+        .game-over p {
+            margin: 10px 0;
+            font-size: 18px;
+        }
+
+        .game-over .btn {
+            background: linear-gradient(45deg, #ff6b35, #ff8c42);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-weight: bold;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+            border: 2px solid #ff6b35;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .game-over .btn:hover {
+            background: linear-gradient(45deg, #ff8c42, #ff6b35);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+        }
+        
+        .countdown {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(26, 26, 46, 0.95);
+            padding: 40px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(255, 107, 53, 0.3);
+            border: 2px solid #ff6b35;
+            display: none;
+            z-index: 1000;
+        }
+        
+        .countdown-number {
+            font-size: 72px;
+            font-weight: bold;
+            color: #ff6b35;
+            text-shadow: 0 0 20px rgba(255, 107, 53, 0.8);
+            margin: 0;
+            animation: pulse 0.5s ease-in-out;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+        
+        .start-btn, .restart-btn {
+            background: linear-gradient(45deg, #ff6b35, #f7931e);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 18px;
+            font-weight: bold;
+            margin: 10px;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 15px rgba(255, 107, 53, 0.3);
+        }
+        
+        .start-btn:hover, .restart-btn:hover {
+            background: linear-gradient(45deg, #f7931e, #ff6b35);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 107, 53, 0.5);
+        }
+        
+        .game-title {
+            font-size: 32px;
+            font-weight: bold;
+            color: #ff6b35;
+            margin-bottom: 20px;
+            text-shadow: 0 0 15px rgba(255, 107, 53, 0.8);
+        }
+        
+        .instructions {
+            color: #e8f5e8;
+            margin-bottom: 20px;
+            font-size: 16px;
+        }
+        
+        h2 {
+            color: #ff6b35;
+            text-shadow: 0 0 10px rgba(255, 107, 53, 0.5);
+        }
+        
+        p {
+            color: #e8f5e8;
+        }
+        .game-info {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .info-item {
+            background: rgba(255, 107, 53, 0.9);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            border: 2px solid #ff6b35;
+        }
+
+        .label {
+            color: #ffdbac;
+            margin-right: 5px;
+        }
+
+        .reset-button {
+            background: linear-gradient(45deg, #ff6b35, #ff8c42);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 25px;
+            font-weight: bold;
+            font-size: 14px;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+            border: 2px solid #ff6b35;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .reset-button:hover {
+            background: linear-gradient(45deg, #ff8c42, #ff6b35);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+        }
+
+        .reset-button:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        .timer-item {
+            background: rgba(255, 0, 0, 0.9) !important;
+            border-color: #ff0000 !important;
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <div class="game-info">
+            <div class="info-item">
+                <span class="label">Speed:</span>
+                <span id="speed">0</span> mph
+            </div>
+            <div class="info-item">
+                <span class="label">Position:</span>
+                <span id="position">1st</span>
+            </div>
+            <div class="info-item">
+                <span class="label">Distance:</span>
+                <span id="distance">0</span> m
+            </div>
+            <div class="info-item timer-item">
+                <span class="label">Time:</span>
+                <span id="timer">30</span>s
+            </div>
+            <button id="resetBtn" class="reset-button">Reset Race</button>
+        </div>
+        <canvas id="gameCanvas" width="800" height="600"></canvas>
+        <div class="controls">
+            <p>Use ARROW KEYS to control The Flash!</p>
+            <p>↑ Accelerate (Slow Build-up) | ↓ Brake | ← → Move Left/Right on Track</p>
+            <p>Race for 30 seconds - go as far as you can!</p>
+        </div>
+        
+        <div class="start-screen" id="startScreen">
+            <div class="game-title">⚡ The Flash Racing ⚡</div>
+            <div class="instructions">
+                <p>Race through Central City as The Flash!</p>
+                <p>Use arrow keys to dodge obstacles and opponents</p>
+                <p>Reach the finish line first to win!</p>
+            </div>
+            <button class="start-btn" onclick="startGame()">Start Race</button>
+        </div>
+        
+        <div id="gameOver" class="game-over" style="display: none;">
+            <h2>🏁 Race Finished! 🏁</h2>
+            <p>Final Position: <span id="finalPosition">1st</span></p>
+            <p>Final Speed: <span id="finalSpeed">0</span> mph</p>
+            <button onclick="restartGame()" class="btn">Race Again</button>
+        </div>
+        
+        <div class="countdown" id="countdown">
+            <div class="countdown-number" id="countdownNumber">3</div>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const speedElement = document.getElementById('speed');
+        const positionElement = document.getElementById('position');
+        const distanceElement = document.getElementById('distance');
+        const timerElement = document.getElementById('timer');
+        const finalPositionElement = document.getElementById('finalPosition');
+        const finalSpeedElement = document.getElementById('finalSpeed');
+        const startScreenElement = document.getElementById('startScreen');
+        const countdownElement = document.getElementById('countdown');
+        const countdownNumberElement = document.getElementById('countdownNumber');
+        const resetBtn = document.getElementById('resetBtn');
+        const gameOverElement = document.getElementById('gameOver');
+
+        // Game variables
+        let gameRunning = false;
+        let gameStarted = false;
+        let countdownActive = false;
+        let countdownValue = 3;
+        let position = 1;
+        let speed = 0;
+        let maxSpeed = 200;
+        let acceleration = 2;
+        let deceleration = 1;
+        let frameCount = 0;
+        let raceDistance = 0;
+        let finishLine = 5000;
+        let buildings = [];
+        let lightningEffects = [];
+        let cameraShake = 0;
+        let roadLines = [];
+        let roadSpeed = 0;
+        let cameraOffset = 200; // Distance behind the player
+
+        // Race timer system
+        let raceTime = 30; // 30 seconds
+        let raceTimer = 30; // Current time remaining
+        let raceStarted = false; // Whether the race has started
+
+        // Race track with curves and turns
+        let raceTrack = [];
+        let trackProgress = 0; // Current position along the track (0-1)
+        let trackLength = 0; // Total track length
+        let currentTrackSegment = 0; // Current track segment index
+
+        // Initialize race track with curves and turns
+        function initRaceTrack() {
+            raceTrack = [
+                // Starting straight
+                { x: 400, y: 600, type: 'straight' },
+                { x: 400, y: 550, type: 'straight' },
+                { x: 400, y: 500, type: 'straight' },
+                
+                // First curve - right turn
+                { x: 450, y: 450, type: 'curve' },
+                { x: 500, y: 400, type: 'curve' },
+                { x: 550, y: 350, type: 'curve' },
+                { x: 600, y: 300, type: 'curve' },
+                
+                // Straight section
+                { x: 650, y: 250, type: 'straight' },
+                { x: 700, y: 200, type: 'straight' },
+                { x: 750, y: 150, type: 'straight' },
+                
+                // Sharp left turn
+                { x: 700, y: 100, type: 'curve' },
+                { x: 650, y: 50, type: 'curve' },
+                { x: 600, y: 0, type: 'curve' },
+                
+                // Back straight
+                { x: 550, y: -50, type: 'straight' },
+                { x: 500, y: -100, type: 'straight' },
+                { x: 450, y: -150, type: 'straight' },
+                
+                // Left curve
+                { x: 400, y: -200, type: 'curve' },
+                { x: 350, y: -250, type: 'curve' },
+                { x: 300, y: -300, type: 'curve' },
+                
+                // Long straight
+                { x: 250, y: -350, type: 'straight' },
+                { x: 200, y: -400, type: 'straight' },
+                { x: 150, y: -450, type: 'straight' },
+                { x: 100, y: -500, type: 'straight' },
+                { x: 50, y: -550, type: 'straight' },
+                
+                // Right curve
+                { x: 0, y: -600, type: 'curve' },
+                { x: -50, y: -650, type: 'curve' },
+                { x: -100, y: -700, type: 'curve' },
+                
+                // Diagonal section
+                { x: -150, y: -750, type: 'straight' },
+                { x: -200, y: -800, type: 'straight' },
+                { x: -250, y: -850, type: 'straight' },
+                
+                // Final curve to finish
+                { x: -300, y: -900, type: 'curve' },
+                { x: -350, y: -950, type: 'curve' },
+                { x: -400, y: -1000, type: 'finish' }
+            ];
+            
+            // Calculate total track length
+            trackLength = 0;
+            for (let i = 1; i < raceTrack.length; i++) {
+                const dx = raceTrack[i].x - raceTrack[i-1].x;
+                const dy = raceTrack[i].y - raceTrack[i-1].y;
+                trackLength += Math.sqrt(dx * dx + dy * dy);
+            }
+        }
+
+        // Get position along the track with direction
+        function getTrackPosition(progress) {
+            const targetDistance = progress * trackLength;
+            let currentDistance = 0;
+            
+            for (let i = 1; i < raceTrack.length; i++) {
+                const dx = raceTrack[i].x - raceTrack[i-1].x;
+                const dy = raceTrack[i].y - raceTrack[i-1].y;
+                const segmentLength = Math.sqrt(dx * dx + dy * dy);
+                
+                if (currentDistance + segmentLength >= targetDistance) {
+                    const segmentProgress = (targetDistance - currentDistance) / segmentLength;
+                    const x = raceTrack[i-1].x + dx * segmentProgress;
+                    const y = raceTrack[i-1].y + dy * segmentProgress;
+                    
+                    // Calculate track direction
+                    const direction = Math.atan2(dy, dx);
+                    
+                    return {
+                        x: x,
+                        y: y,
+                        segment: i - 1,
+                        direction: direction
+                    };
+                }
+                currentDistance += segmentLength;
+            }
+            
+            return { 
+                x: raceTrack[raceTrack.length - 1].x, 
+                y: raceTrack[raceTrack.length - 1].y, 
+                segment: raceTrack.length - 1,
+                direction: 0
+            };
+        }
+
+        // Get track width at a specific position
+        function getTrackWidth(progress) {
+            const trackPos = getTrackPosition(progress);
+            const segment = trackPos.segment;
+            
+            // Different track widths for different sections
+            if (raceTrack[segment].type === 'curve') {
+                return 80; // Wider for curves
+            } else if (raceTrack[segment].type === 'straight') {
+                return 60; // Standard width for straights
+            } else {
+                return 100; // Extra wide for finish
+            }
+        }
+
+        // The Flash properties
+        const flash = {
+            x: 400,
+            y: 600,
+            width: 30,
+            height: 50,
+            speed: 0,
+            maxSpeed: 50, // Reduced from 200 to start much slower
+            acceleration: 0.5, // Reduced from 2 to very slow acceleration
+            deceleration: 0.3, // Reduced from 1 to slower deceleration
+            position: 1,
+            lightningTrail: [],
+            // Track movement properties
+            trackProgress: 0, // Position along the track (0-1)
+            forwardPosition: 0, // Lateral position on track
+            maxForwardSpeed: 2 // Reduced from 5 to slower lateral movement
+        };
+
+        // AI racers (positioned relative to player on track)
+        const aiRacers = [
+            { x: 400, y: 600, width: 30, height: 50, speed: 0, maxSpeed: 45, acceleration: 0.4, name: "Reverse Flash", color: "#ff0000", forwardOffset: -50, trackProgress: 0 },
+            { x: 400, y: 600, width: 30, height: 50, speed: 0, maxSpeed: 40, acceleration: 0.35, name: "Zoom", color: "#800080", forwardOffset: 50, trackProgress: 0 },
+            { x: 400, y: 600, width: 30, height: 50, speed: 0, maxSpeed: 35, acceleration: 0.3, name: "Godspeed", color: "#ffd700", forwardOffset: 0, trackProgress: 0 }
+        ];
+
+        // Initialize road lines for first-person view
+        function initRoadLines() {
+            roadLines = [];
+            for (let i = 0; i < 20; i++) {
+                roadLines.push({
+                    y: i * 100,
+                    width: 200 + Math.random() * 50
+                });
+            }
+        }
+
+        // Initialize buildings
+        function initBuildings() {
+            buildings = [];
+            for (let i = 0; i < 20; i++) {
+                buildings.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * 200 + 50,
+                    width: Math.random() * 100 + 50,
+                    height: Math.random() * 200 + 100,
+                    color: `hsl(${Math.random() * 60 + 200}, 50%, ${Math.random() * 30 + 40}%)`
+                });
+            }
+        }
+
+        // Initialize game
+        function init() {
+            flash.x = 400;
+            flash.y = 600;
+            flash.speed = 0;
+            flash.position = 1;
+            flash.lightningTrail = [];
+            flash.trackProgress = 0;
+            flash.forwardPosition = 0;
+            
+            aiRacers.forEach((racer, index) => {
+                racer.x = 400; // Center them on the track
+                racer.y = 600;
+                racer.speed = 0;
+                racer.trackProgress = 0; // Reset track progress
+            });
+            
+            raceDistance = 0;
+            position = 1;
+            speed = 0;
+            frameCount = 0;
+            cameraShake = 0;
+            roadSpeed = 0;
+            positionElement.textContent = position + getOrdinalSuffix(position);
+            speedElement.textContent = speed;
+            distanceElement.textContent = raceDistance;
+            
+            // Reset race timer
+            raceTimer = raceTime;
+            raceStarted = false;
+            timerElement.textContent = raceTimer;
+            
+            gameOverElement.style.display = 'none';
+            startScreenElement.style.display = 'block';
+            countdownElement.style.display = 'none';
+            gameRunning = false;
+            gameStarted = false;
+            countdownActive = false;
+            countdownValue = 3;
+            lightningEffects = [];
+            initBuildings();
+            initRoadLines();
+            initRaceTrack(); // Initialize race track
+        }
+
+        // Get ordinal suffix
+        function getOrdinalSuffix(num) {
+            if (num === 1) return 'st';
+            if (num === 2) return 'nd';
+            if (num === 3) return 'rd';
+            return 'th';
+        }
+
+        // Start the game
+        function startGame() {
+            gameStarted = true;
+            startScreenElement.style.display = 'none';
+            countdownActive = true;
+            countdownValue = 3;
+            countdownNumberElement.textContent = countdownValue;
+            countdownElement.style.display = 'block';
+            startCountdown();
+        }
+
+        // Countdown function
+        function startCountdown() {
+            const countdownInterval = setInterval(() => {
+                countdownValue--;
+                countdownNumberElement.textContent = countdownValue;
+                
+                if (countdownValue <= 0) {
+                    clearInterval(countdownInterval);
+                    countdownNumberElement.textContent = 'GO!';
+                    
+                    setTimeout(() => {
+                        countdownElement.style.display = 'none';
+                        countdownActive = false;
+                        gameRunning = true;
+                        raceStarted = true; // Start the race timer
+                        gameLoop();
+                    }, 500);
+                }
+            }, 1000);
+        }
+
+        // Update Flash
+        function updateFlash() {
+            // Handle input
+            if (keys.ArrowUp && flash.speed < flash.maxSpeed) {
+                flash.speed += flash.acceleration;
+            } else if (keys.ArrowDown && flash.speed > 0) {
+                flash.speed -= flash.deceleration * 2;
+            } else if (flash.speed > 0) {
+                flash.speed -= flash.deceleration;
+            }
+            
+            if (flash.speed < 0) flash.speed = 0;
+            
+            // Move Flash along the track
+            flash.trackProgress += flash.speed * 0.0005; // Reduced from 0.001 to make movement much slower
+            if (flash.trackProgress > 1) flash.trackProgress = 1;
+            
+            // Get position and direction on track
+            const trackPos = getTrackPosition(flash.trackProgress);
+            const trackWidth = getTrackWidth(flash.trackProgress);
+            const maxLateralOffset = trackWidth / 2 - 15; // Keep characters within track bounds
+            
+            flash.x = trackPos.x;
+            flash.y = trackPos.y;
+            
+            // Lateral movement (left/right on track) with track boundaries
+            if (keys.ArrowLeft && flash.forwardPosition > -maxLateralOffset) {
+                flash.forwardPosition -= flash.maxForwardSpeed;
+            }
+            if (keys.ArrowRight && flash.forwardPosition < maxLateralOffset) {
+                flash.forwardPosition += flash.maxForwardSpeed;
+            }
+            
+            // Clamp lateral position to track boundaries
+            flash.forwardPosition = Math.max(-maxLateralOffset, Math.min(maxLateralOffset, flash.forwardPosition));
+            
+            // Add camera shake based on speed
+            cameraShake = flash.speed * 0.01;
+            
+            // Update road speed for perspective
+            roadSpeed = flash.speed * 0.2;
+            
+            // Add lightning trail
+            flash.lightningTrail.push({ x: flash.x, y: flash.y, age: 0 });
+            if (flash.lightningTrail.length > 10) {
+                flash.lightningTrail.shift();
+            }
+            
+            // Update trail age
+            flash.lightningTrail.forEach(trail => trail.age++);
+            
+            // Update race distance (now based on track progress)
+            raceDistance = Math.round(flash.trackProgress * trackLength);
+            
+            // Update speed display
+            speed = Math.round(flash.speed);
+            speedElement.textContent = speed;
+            distanceElement.textContent = raceDistance;
+        }
+
+        // Update AI racers
+        function updateAIRacers() {
+            aiRacers.forEach(racer => {
+                // AI acceleration
+                if (racer.speed < racer.maxSpeed) {
+                    racer.speed += racer.acceleration;
+                }
+                
+                // Move AI racers along the track
+                racer.trackProgress += racer.speed * 0.0005; // Reduced to match player's slower movement
+                if (racer.trackProgress > 1) racer.trackProgress = 1;
+                
+                // Get position and direction on track
+                const trackPos = getTrackPosition(racer.trackProgress);
+                const trackWidth = getTrackWidth(racer.trackProgress);
+                const maxLateralOffset = trackWidth / 2 - 15;
+                
+                racer.x = trackPos.x;
+                racer.y = trackPos.y;
+                
+                // AI lateral movement (relative to player) with track boundaries
+                racer.forwardOffset += Math.sin(frameCount * 0.02 + racer.trackProgress * 10) * 0.5;
+                
+                // Clamp AI lateral position to track boundaries
+                racer.forwardOffset = Math.max(-maxLateralOffset, Math.min(maxLateralOffset, racer.forwardOffset));
+            });
+        }
+
+        // Check race positions
+        function updatePositions() {
+            const allRacers = [flash, ...aiRacers];
+            allRacers.sort((a, b) => b.trackProgress - a.trackProgress); // Sort by track progress (higher = ahead)
+            
+            const flashIndex = allRacers.findIndex(racer => racer === flash);
+            position = flashIndex + 1;
+            positionElement.textContent = position + getOrdinalSuffix(position);
+        }
+
+        // Check if race is finished
+        function checkRaceFinish() {
+            if (raceTimer <= 0) { // Finish when time runs out
+                gameOver();
+                return true;
+            }
+            return false;
+        }
+
+        // Draw the race track with boundaries
+        function drawRaceTrack() {
+            // Draw track boundaries
+            ctx.strokeStyle = '#ffffff';
+            ctx.lineWidth = 12;
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+            
+            ctx.beginPath();
+            ctx.moveTo(raceTrack[0].x, raceTrack[0].y);
+            for (let i = 1; i < raceTrack.length; i++) {
+                ctx.lineTo(raceTrack[i].x, raceTrack[i].y);
+            }
+            ctx.stroke();
+            
+            // Draw track surface
+            ctx.strokeStyle = '#333333';
+            ctx.lineWidth = 8;
+            
+            ctx.beginPath();
+            ctx.moveTo(raceTrack[0].x, raceTrack[0].y);
+            for (let i = 1; i < raceTrack.length; i++) {
+                ctx.lineTo(raceTrack[i].x, raceTrack[i].y);
+            }
+            ctx.stroke();
+            
+            // Draw track center line
+            ctx.strokeStyle = '#ff6b35';
+            ctx.lineWidth = 3;
+            ctx.setLineDash([20, 10]);
+            
+            ctx.beginPath();
+            ctx.moveTo(raceTrack[0].x, raceTrack[0].y);
+            for (let i = 1; i < raceTrack.length; i++) {
+                ctx.lineTo(raceTrack[i].x, raceTrack[i].y);
+            }
+            ctx.stroke();
+            ctx.setLineDash([]);
+            
+            // Draw track waypoints with different colors for different types
+            raceTrack.forEach((waypoint, index) => {
+                let waypointColor = '#ff6b35';
+                let waypointSize = 5;
+                
+                if (waypoint.type === 'finish') {
+                    waypointColor = '#ffff00';
+                    waypointSize = 8;
+                } else if (waypoint.type === 'curve') {
+                    waypointColor = '#00ff00';
+                    waypointSize = 6;
+                }
+                
+                ctx.fillStyle = waypointColor;
+                ctx.beginPath();
+                ctx.arc(waypoint.x, waypoint.y, waypointSize, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // Draw waypoint labels for important points
+                if (index % 5 === 0 || waypoint.type === 'finish') {
+                    ctx.fillStyle = '#ffffff';
+                    ctx.font = '12px Arial';
+                    ctx.textAlign = 'center';
+                    ctx.fillText(`${index}`, waypoint.x, waypoint.y - 15);
+                    ctx.textAlign = 'left';
+                }
+            });
+            
+            // Draw track direction arrows
+            for (let i = 0; i < raceTrack.length - 1; i += 3) {
+                const dx = raceTrack[i + 1].x - raceTrack[i].x;
+                const dy = raceTrack[i + 1].y - raceTrack[i].y;
+                const direction = Math.atan2(dy, dx);
+                const midX = (raceTrack[i].x + raceTrack[i + 1].x) / 2;
+                const midY = (raceTrack[i].y + raceTrack[i + 1].y) / 2;
+                
+                // Draw direction arrow
+                ctx.strokeStyle = '#ffffff';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.moveTo(midX, midY);
+                ctx.lineTo(midX + Math.cos(direction) * 15, midY + Math.sin(direction) * 15);
+                ctx.stroke();
+            }
+        }
+
+        // Draw third-person road view (following upward movement)
+        function drawThirdPersonRoad() {
+            // Sky gradient
+            const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+            gradient.addColorStop(0, '#1a1a2e');
+            gradient.addColorStop(0.7, '#16213e');
+            gradient.addColorStop(1, '#333333');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Apply camera shake
+            ctx.save();
+            ctx.translate(Math.sin(frameCount * 0.1) * cameraShake, 0);
+            
+            // Calculate camera position (behind the player vertically)
+            const cameraY = flash.y + cameraOffset;
+            
+            // Draw road with perspective (vertical)
+            ctx.fillStyle = '#333333';
+            ctx.beginPath();
+            ctx.moveTo(0, canvas.height);
+            ctx.lineTo(canvas.width * 0.3, canvas.height * 0.7);
+            ctx.lineTo(canvas.width * 0.7, canvas.height * 0.7);
+            ctx.lineTo(canvas.width, canvas.height);
+            ctx.closePath();
+            ctx.fill();
+            
+            // Draw road lines with perspective (vertical) - enhanced movement
+            ctx.strokeStyle = '#ffffff';
+            ctx.lineWidth = 3;
+            ctx.setLineDash([20, 20]);
+            
+            for (let i = 0; i < 15; i++) { // Increased number of lines
+                const y = canvas.height - (i * 40) - (roadSpeed * 20); // Enhanced movement
+                const width = 50 + i * 25; // Enhanced perspective
+                const x1 = canvas.width / 2 - width / 2;
+                const x2 = canvas.width / 2 + width / 2;
+                
+                if (y > canvas.height * 0.7) {
+                    ctx.beginPath();
+                    ctx.moveTo(x1, y);
+                    ctx.lineTo(x2, y);
+                    ctx.stroke();
+                }
+            }
+            ctx.setLineDash([]);
+            
+            // Draw buildings on sides (relative to camera) - enhanced movement
+            buildings.forEach(building => {
+                const buildingY = building.y - cameraY;
+                const buildingX = building.x;
+                
+                if (buildingY > -100 && buildingY < canvas.height + 100) {
+                    const scale = 1 - (buildingY / canvas.height);
+                    const buildingWidth = building.width * scale;
+                    const buildingHeight = building.height * scale;
+                    
+                    ctx.fillStyle = building.color;
+                    ctx.fillRect(buildingX, buildingY, buildingWidth, buildingHeight);
+                    
+                    // Building windows with enhanced movement
+                    ctx.fillStyle = '#ffff00';
+                    for (let i = 0; i < buildingWidth; i += 20 * scale) {
+                        for (let j = 0; j < buildingHeight; j += 30 * scale) {
+                            if (Math.random() > 0.7) {
+                                ctx.fillRect(buildingX + i, buildingY + j, 10 * scale, 15 * scale);
+                            }
+                        }
+                    }
+                    
+                    // Add motion blur effect for buildings moving past
+                    if (roadSpeed > 5) {
+                        ctx.fillStyle = `rgba(255, 255, 255, ${roadSpeed * 0.01})`;
+                        ctx.fillRect(buildingX - 10, buildingY, buildingWidth + 20, buildingHeight);
+                    }
+                }
+            });
+            
+            ctx.restore();
+        }
+
+        // Draw lightning effects
+        function drawLightningEffects() {
+            lightningEffects.forEach((effect, index) => {
+                ctx.strokeStyle = `rgba(255, 255, 255, ${1 - effect.age / 30})`;
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.moveTo(effect.x1, effect.y1);
+                ctx.lineTo(effect.x2, effect.y2);
+                ctx.stroke();
+                
+                effect.age++;
+                if (effect.age > 30) {
+                    lightningEffects.splice(index, 1);
+                }
+            });
+        }
+
+        // Draw The Flash from third-person perspective (vertical movement)
+        function drawFlash() {
+            // Calculate Flash position on screen (center of screen with lateral movement)
+            const flashScreenX = canvas.width / 2 + flash.forwardPosition * 0.5;
+            const flashScreenY = canvas.height * 0.8;
+            
+            // Get track direction for character orientation
+            const trackPos = getTrackPosition(flash.trackProgress);
+            const direction = trackPos.direction;
+            
+            // Draw lightning trail behind Flash
+            flash.lightningTrail.forEach((trail, index) => {
+                const alpha = 1 - (trail.age / 10);
+                ctx.strokeStyle = `rgba(255, 255, 255, ${alpha})`;
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.moveTo(flashScreenX - 20, flashScreenY + 25);
+                ctx.lineTo(flashScreenX - 40 - index * 5, flashScreenY + 25);
+                ctx.stroke();
+            });
+            
+            // Save context for rotation
+            ctx.save();
+            ctx.translate(flashScreenX, flashScreenY);
+            ctx.rotate(direction);
+            
+            // Flash body
+            ctx.fillStyle = '#ff6b35';
+            ctx.fillRect(-15, -25, 30, 50);
+            
+            // Flash lightning symbol
+            ctx.fillStyle = '#ffffff';
+            ctx.beginPath();
+            ctx.moveTo(-10, -15);
+            ctx.lineTo(0, -5);
+            ctx.lineTo(-5, 0);
+            ctx.lineTo(5, 10);
+            ctx.fill();
+            
+            // Flash glow effect
+            ctx.shadowColor = '#ff6b35';
+            ctx.shadowBlur = 20;
+            ctx.fillRect(-15, -25, 30, 50);
+            ctx.shadowBlur = 0;
+            
+            // Flash running animation
+            const runOffset = Math.sin(frameCount * 0.2) * 3;
+            ctx.fillStyle = '#ffdbac';
+            // Arms
+            ctx.fillRect(-20, -15 + runOffset, 8, 15);
+            ctx.fillRect(12, -15 - runOffset, 8, 15);
+            // Legs
+            ctx.fillStyle = '#4a90e2';
+            ctx.fillRect(-10, 15 + runOffset, 6, 12);
+            ctx.fillRect(4, 15 - runOffset, 6, 12);
+            
+            // Restore context
+            ctx.restore();
+        }
+
+        // Draw AI racers from third-person perspective (vertical movement)
+        function drawAIRacers() {
+            const cameraY = flash.y + cameraOffset;
+            
+            aiRacers.forEach(racer => {
+                // Calculate racer position relative to camera
+                const racerScreenX = canvas.width / 2 + (racer.forwardOffset - flash.forwardPosition) * 0.5;
+                const racerScreenY = (racer.y - cameraY) + canvas.height * 0.8;
+                
+                // Only draw racers that are visible
+                if (racerScreenY > -50 && racerScreenY < canvas.height + 50) {
+                    // Get track direction for character orientation
+                    const trackPos = getTrackPosition(racer.trackProgress);
+                    const direction = trackPos.direction;
+                    
+                    // Save context for rotation
+                    ctx.save();
+                    ctx.translate(racerScreenX, racerScreenY);
+                    ctx.rotate(direction);
+                    
+                    // Racer body
+                    ctx.fillStyle = racer.color;
+                    ctx.fillRect(-15, -25, 30, 50);
+                    
+                    // Racer glow
+                    ctx.shadowColor = racer.color;
+                    ctx.shadowBlur = 15;
+                    ctx.fillRect(-15, -25, 30, 50);
+                    ctx.shadowBlur = 0;
+                    
+                    // Racer name
+                    ctx.fillStyle = '#ffffff';
+                    ctx.font = '12px Arial';
+                    ctx.textAlign = 'center';
+                    ctx.fillText(racer.name, 0, -35);
+                    ctx.textAlign = 'left';
+                    
+                    // Racer running animation
+                    const runOffset = Math.sin(frameCount * 0.2 + racer.trackProgress * 10) * 3;
+                    ctx.fillStyle = '#ffdbac';
+                    // Arms
+                    ctx.fillRect(-20, -15 + runOffset, 8, 15);
+                    ctx.fillRect(12, -15 - runOffset, 8, 15);
+                    // Legs
+                    ctx.fillStyle = '#4a90e2';
+                    ctx.fillRect(-10, 15 + runOffset, 6, 12);
+                    ctx.fillRect(4, 15 - runOffset, 6, 12);
+                    
+                    // Restore context
+                    ctx.restore();
+                }
+            });
+        }
+
+        // Draw HUD with enhanced progress indicator
+        function drawHUD() {
+            // Speed indicator
+            ctx.fillStyle = 'rgba(255, 107, 53, 0.8)';
+            ctx.fillRect(10, 10, 200, 60);
+            ctx.strokeStyle = '#ff6b35';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(10, 10, 200, 60);
+
+            ctx.fillStyle = '#ffffff';
+            ctx.font = '16px Arial';
+            ctx.fillText('SPEED', 20, 30);
+            ctx.font = '24px Arial';
+            ctx.fillText(speed + ' mph', 20, 55);
+            
+            // Position indicator
+            ctx.fillStyle = 'rgba(255, 107, 53, 0.8)';
+            ctx.fillRect(canvas.width - 210, 10, 200, 60);
+            ctx.strokeStyle = '#ff6b35';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(canvas.width - 210, 10, 200, 60);
+
+            ctx.fillStyle = '#ffffff';
+            ctx.font = '16px Arial';
+            ctx.fillText('POSITION', canvas.width - 200, 30);
+            ctx.font = '24px Arial';
+            ctx.fillText(position + getOrdinalSuffix(position), canvas.width - 200, 55);
+            
+            // Progress indicator - shows time remaining
+            const progressBarWidth = 400;
+            const progressBarHeight = 20;
+            const progressBarX = (canvas.width - progressBarWidth) / 2;
+            const progressBarY = canvas.height - 40;
+            
+            // Background
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+            ctx.fillRect(progressBarX, progressBarY, progressBarWidth, progressBarHeight);
+            
+            // Progress fill (time remaining)
+            const timeProgress = raceTimer / raceTime;
+            const fillWidth = progressBarWidth * timeProgress;
+            
+            // Color changes based on time remaining
+            let progressColor;
+            if (timeProgress > 0.6) {
+                progressColor = 'linear-gradient(90deg, #00ff00, #00cc00)'; // Green
+            } else if (timeProgress > 0.3) {
+                progressColor = 'linear-gradient(90deg, #ffff00, #ffcc00)'; // Yellow
+            } else {
+                progressColor = 'linear-gradient(90deg, #ff0000, #cc0000)'; // Red
+            }
+            
+            ctx.fillStyle = progressColor;
+            ctx.fillRect(progressBarX, progressBarY, fillWidth, progressBarHeight);
+            
+            // Border
+            ctx.strokeStyle = '#ff6b35';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(progressBarX, progressBarY, progressBarWidth, progressBarHeight);
+            
+            // Progress text
+            ctx.fillStyle = '#ffffff';
+            ctx.font = '14px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText(`TIME REMAINING: ${Math.ceil(raceTimer)}s`, canvas.width / 2, progressBarY - 5);
+            ctx.textAlign = 'left';
+            
+            // Distance indicator
+            ctx.fillStyle = 'rgba(255, 107, 53, 0.8)';
+            ctx.fillRect(canvas.width - 220, 100, 200, 60);
+            ctx.strokeStyle = '#ff6b35';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(canvas.width - 220, 100, 200, 60);
+
+            ctx.fillStyle = '#ffffff';
+            ctx.font = '16px Arial';
+            ctx.fillText('DISTANCE', canvas.width - 210, 120);
+            ctx.font = '24px Arial';
+            ctx.fillText(raceDistance + ' m', canvas.width - 210, 145);
+            
+            // Lightning trail effect on screen edges
+            if (speed > 50) {
+                ctx.strokeStyle = `rgba(255, 255, 255, ${speed * 0.005})`;
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.moveTo(0, 0);
+                ctx.lineTo(50, 0);
+                ctx.moveTo(canvas.width - 50, 0);
+                ctx.lineTo(canvas.width, 0);
+                ctx.stroke();
+            }
+        }
+
+        // Draw finish line at the top of the screen
+        function drawFinishLine() {
+            // Always show finish line at the top since we're racing upward
+            // Draw finish line at the top of the screen
+            ctx.strokeStyle = '#ffffff';
+            ctx.lineWidth = 8;
+            ctx.setLineDash([15, 15]);
+            ctx.beginPath();
+            ctx.moveTo(0, 50);
+            ctx.lineTo(canvas.width, 50);
+            ctx.stroke();
+            ctx.setLineDash([]);
+            
+            // Finish line text at the top
+            ctx.fillStyle = '#ffffff';
+            ctx.font = 'bold 24px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText('🏁 FINISH LINE 🏁', canvas.width / 2, 35);
+            ctx.textAlign = 'left';
+            
+            // Add glow effect to finish line
+            ctx.shadowColor = '#ffff00';
+            ctx.shadowBlur = 10;
+            ctx.strokeStyle = '#ffff00';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.moveTo(0, 50);
+            ctx.lineTo(canvas.width, 50);
+            ctx.stroke();
+            ctx.shadowBlur = 0;
+        }
+
+        // Game over
+        function gameOver() {
+            gameRunning = false;
+            finalPositionElement.textContent = position + getOrdinalSuffix(position);
+            finalSpeedElement.textContent = speed;
+            gameOverElement.style.display = 'block';
+        }
+
+        // Restart game
+        function restartGame() {
+            init();
+        }
+
+        // Reset game
+        function resetGame() {
+            // Reset all game state
+            gameRunning = false;
+            gameStarted = false;
+            countdownActive = false;
+            countdownValue = 3;
+            
+            // Reset UI elements
+            gameOverElement.style.display = 'none';
+            startScreenElement.style.display = 'block';
+            countdownElement.style.display = 'none';
+            countdownNumberElement.textContent = countdownValue;
+            
+            // Reset game variables
+            frameCount = 0;
+            raceDistance = 0;
+            position = 1;
+            speed = 0;
+            trackProgress = 0;
+            raceTimer = raceTime;
+            raceStarted = false;
+            
+            // Update display elements
+            positionElement.textContent = '1st';
+            speedElement.textContent = '0';
+            distanceElement.textContent = '0';
+            timerElement.textContent = raceTimer;
+            
+            // Reinitialize game objects
+            init();
+            
+            // Start the idle loop
+            requestAnimationFrame(idleLoop);
+        }
+
+        // Main game loop
+        function gameLoop() {
+            if (!gameRunning || countdownActive) return;
+            
+            // Update race timer
+            if (raceStarted) {
+                raceTimer -= 1/60; // Decrease by 1/60th of a second (60 FPS)
+                if (raceTimer < 0) raceTimer = 0;
+                timerElement.textContent = Math.ceil(raceTimer);
+            }
+            
+            // Clear canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Draw background
+            drawThirdPersonRoad();
+            drawFinishLine();
+            drawRaceTrack(); // Draw the race track
+            
+            // Update game objects
+            updateFlash();
+            updateAIRacers();
+            updatePositions();
+            
+            // Check race finish
+            if (checkRaceFinish()) return;
+            
+            // Draw game objects
+            drawLightningEffects();
+            drawAIRacers();
+            drawHUD(); // Draw HUD after all other elements
+            drawFlash(); // Draw The Flash from third-person perspective
+            
+            frameCount++;
+            requestAnimationFrame(gameLoop);
+        }
+
+        // Input handling
+        const keys = {};
+        document.addEventListener('keydown', (e) => {
+            keys[e.key] = true;
+        });
+        document.addEventListener('keyup', (e) => {
+            keys[e.key] = false;
+        });
+
+        // Reset button handler
+        resetBtn.addEventListener('click', resetGame);
+
+        // Start the game
+        init();
+    </script>
+</body>
+</html> 
